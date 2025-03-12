@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry-community/splunk-firehose-nozzle/cache"
 	"github.com/cloudfoundry-community/splunk-firehose-nozzle/utils"
@@ -36,6 +38,8 @@ var AppMetadata = []string{
 	"SpaceName",
 	"SpaceGuid",
 }
+
+var logFile *os.File
 
 func HttpStart(msg *events.Envelope) *Event {
 	httpStart := msg.GetHttpStart()
@@ -250,23 +254,34 @@ func (e *Event) parseAndAnnotateWithAppInfo(appInfo *cache.App, config *Config) 
 		e.Fields["info_splunk_index"] = appLabels["SPLUNK_INDEX"]
 	}
 
-	fmt.Printf("DEBUG 2 --- RABO_CI: %s\n", *appLabels["RABO_CI"])
+	WriteToFile(fmt.Sprintf("DEBUG 2 --- RABO_CI: %s\n", *appLabels["RABO_CI"]))
 	if appLabels["RABO_CI"] != nil {
 		e.Fields["rabo_ci"] = appLabels["RABO_CI"]
-		fmt.Printf("DEBUG --- RABO_CI: %s\n", *appLabels["RABO_CI"])
+		WriteToFile(fmt.Sprintf("DEBUG --- RABO_CI: %s\n", *appLabels["RABO_CI"]))
 	}
 
 	// iterate over all labels starting with "RABO_LOG_" and set those as fields
 	for key, value := range appLabels {
 		if strings.HasPrefix(key, "RABO_LOG_") {
 			e.Fields[key] = value
-			fmt.Printf("DEBUG --- %s: %s\n", key, *value)
+			WriteToFile(fmt.Sprintf("DEBUG --- %s: %s\n", key, *value))
 		}
 	}
 
 	if cfIgnoredApp {
 		e.Fields["cf_ignored_app"] = cfIgnoredApp
 	}
+}
+
+func WriteToFile(text string) {
+	var err error
+	if logFile == nil {
+		if logFile, err = os.OpenFile("/tmp/logfile.out", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644); err != nil {
+			fmt.Printf("Error opening file: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	_, _ = logFile.WriteString(time.Now().Format(time.RFC3339) + " " + text + "\n")
 }
 
 func (e *Event) AnnotateWithCFMetaData() {
