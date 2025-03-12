@@ -251,13 +251,15 @@ func (e *Event) parseAndAnnotateWithAppInfo(appInfo *cache.App, config *Config) 
 	}
 
 	if appLabels["RABO_CI"] != nil {
-		e.Fields["rabo_ci"] = appLabels["SPLUNK_INDEX"]
+		e.Fields["rabo_ci"] = appLabels["RABO_CI"]
+		fmt.Printf("DEBUG --- RABO_CI: %s\n", *appLabels["RABO_CI"])
 	}
 
 	// iterate over all labels starting with "RABO_LOG_" and set those as fields
 	for key, value := range appLabels {
 		if strings.HasPrefix(key, "RABO_LOG_") {
 			e.Fields[key] = value
+			fmt.Printf("DEBUG --- %s: %s\n", key, *value)
 		}
 	}
 
