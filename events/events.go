@@ -250,6 +250,7 @@ func (e *Event) parseAndAnnotateWithAppInfo(appInfo *cache.App, config *Config) 
 		e.Fields["info_splunk_index"] = appLabels["SPLUNK_INDEX"]
 	}
 
+	fmt.Printf("DEBUG 2 --- RABO_CI: %s\n", *appLabels["RABO_CI"])
 	if appLabels["RABO_CI"] != nil {
 		e.Fields["rabo_ci"] = appLabels["RABO_CI"]
 		fmt.Printf("DEBUG --- RABO_CI: %s\n", *appLabels["RABO_CI"])
