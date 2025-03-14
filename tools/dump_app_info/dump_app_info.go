@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
+	kingpin "github.com/alecthomas/kingpin/v2"
 	"github.com/cloudfoundry-community/splunk-firehose-nozzle/cache"
-	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 func main() {

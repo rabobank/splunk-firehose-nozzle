@@ -8,7 +8,7 @@ import (
 
 	"github.com/cloudfoundry-community/splunk-firehose-nozzle/events"
 
-	kingpin "gopkg.in/alecthomas/kingpin.v2"
+	kingpin "github.com/alecthomas/kingpin/v2"
 )
 
 type Config struct {
